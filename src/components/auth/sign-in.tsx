@@ -1,15 +1,14 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Loader2, Key } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -85,10 +84,10 @@ export default function SignIn() {
                     password
                 },
                 {
-                  onRequest: (ctx) => {
+                  onRequest: () => {
                     setLoading(true);
                   },
-                  onResponse: (ctx) => {
+                  onResponse: () => {
                     setLoading(false);
                   },
                 },

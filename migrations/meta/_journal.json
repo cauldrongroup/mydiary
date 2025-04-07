@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1743982855990,
+      "tag": "0000_lying_proteus",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1743983328528,
+      "tag": "0001_natural_stellaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1743984423100,
+      "tag": "0002_cute_mandrill",
+      "breakpoints": true
+    }
+  ]
+}

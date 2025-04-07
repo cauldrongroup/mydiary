@@ -1,103 +1,115 @@
-import Image from "next/image";
+import { auth } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { db } from '@/db';
+import { diaryEntries, streaks } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { format } from 'date-fns';
+import Link from 'next/link';
 
-export default function Home() {
+function truncateContent(content: string, maxLength: number = 150): string {
+  // Remove Markdown syntax
+  const cleanContent = content
+    .replace(/#{1,6}\s/g, '') // Remove headers
+    .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold
+    .replace(/\*(.+?)\*/g, '$1') // Remove italic
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1') // Remove links, keep text
+    .replace(/^[-*+]\s/gm, '') // Remove list markers
+    .trim();
+
+  if (cleanContent.length <= maxLength) return cleanContent;
+  
+  // Find the last complete word within the limit
+  const truncated = cleanContent.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  return lastSpace > 0 
+    ? truncated.slice(0, lastSpace) + '...'
+    : truncated + '...';
+}
+
+async function getEntries(userId: string) {
+  const entries = await db.select()
+    .from(diaryEntries)
+    .where(eq(diaryEntries.userId, userId))
+    .orderBy(diaryEntries.entryDate)
+    .all();
+
+  return entries;
+}
+
+async function getStreak(userId: string) {
+  const userStreak = await db.query.streaks.findFirst({
+    where: eq(streaks.userId, userId),
+  });
+
+  return userStreak?.currentStreak || 0;
+}
+
+export default async function Home() {
+  const cookieHeader = cookies().toString();
+  const headers = new Headers();
+  headers.append('cookie', cookieHeader);
+
+  const session = await auth.api.getSession({
+    headers,
+  });
+
+  if (!session?.user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="text-4xl font-bold mb-8">Welcome to MyDiary</h1>
+        <p className="text-lg mb-8">Please sign in to start writing your diary.</p>
+        <Link
+          href="/api/auth/signin"
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
+        >
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+
+  const entries = await getEntries(session.user.id);
+  const streak = await getStreak(session.user.id);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Welcome back, {session.user.name}!</h1>
+        <div className="text-center">
+          <div className="text-4xl font-bold">{streak}</div>
+          <div className="text-sm text-muted-foreground">Day Streak</div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">Recent Entries</h2>
+        {entries.length === 0 ? (
+          <p className="text-muted-foreground">No entries yet. Start writing today!</p>
+        ) : (
+          <div className="grid gap-4">
+            {entries.slice(0, 5).map((entry) => (
+              <Link
+                key={entry.id}
+                href={`/entry/${entry.entryDate}`}
+                className="block bg-card p-4 rounded-lg hover:shadow-md transition-shadow"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 mr-4">
+                    <h3 className="font-semibold mb-2">{entry.title}</h3>
+                    <p className="text-muted-foreground">
+                      {truncateContent(entry.content)}
+                    </p>
+                  </div>
+                  <time className="text-sm text-muted-foreground whitespace-nowrap">
+                    {format(new Date(entry.entryDate), 'MMM d, yyyy')}
+                  </time>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
