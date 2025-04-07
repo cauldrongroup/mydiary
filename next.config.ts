@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   generateEtags: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
   /* config options here */
 };
 
