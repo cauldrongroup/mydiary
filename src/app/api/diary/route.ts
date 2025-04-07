@@ -4,6 +4,21 @@ import { diaryEntries, streaks } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 
+/**
+ * Updates the user's diary streak based on a new diary entry date.
+ *
+ * This function retrieves the current streak record for the user and determines
+ * whether to create, increment, or reset the streak based on the provided entry date.
+ * It computes yesterday's date from the entry date and compares it with the user's
+ * last recorded entry:
+ * - Creates a new streak record if none exists.
+ * - Increments the streak (and updates the longest streak if needed) if the last entry was yesterday.
+ * - Resets the streak to 1 if the last entry was before yesterday.
+ * No update is made when the entry date is the same as the current recorded entry.
+ *
+ * @param userId - The unique identifier of the user.
+ * @param entryDate - The ISO string representing the diary entry date.
+ */
 async function updateStreak(userId: string, entryDate: string) {
   // Get the current streak info
   const userStreak = await db.query.streaks.findFirst({
@@ -51,6 +66,14 @@ async function updateStreak(userId: string, entryDate: string) {
   // If entry is for today, don't update the streak
 }
 
+/**
+ * Handles HTTP POST requests to create a new diary entry.
+ *
+ * This handler authenticates the user's session using request headers. It then parses the request's JSON body for the diary entry data, including the title, content, and entryDate. If the user is not authenticated, it returns a 401 response. If an entry for the given date already exists for the user, it returns a 409 response. On successfully creating the new diary entry, it updates the user's streak and returns the created entry as a JSON response. In case of an unexpected error, it logs the error and returns a 500 response.
+ *
+ * @param req - The HTTP request containing headers for authentication and a JSON payload with the new diary entry data.
+ * @returns A JSON response containing the created diary entry or an error message.
+ */
 export async function POST(req: Request) {
   try {
     const session = await auth.api.getSession({
@@ -97,6 +120,18 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * Updates an existing diary entry.
+ *
+ * Verifies the authenticated user's session and checks whether the diary entry for the specified date is eligible for editing.
+ * If editing is permitted, the function updates the entry with the new title and content, sets the current timestamp, and returns the updated entry in JSON format.
+ *
+ * @remarks
+ * Returns a 401 status if the user is not authenticated, a 403 status if the diary entry can no longer be edited, and a 500 status in case of an internal error.
+ *
+ * @param req - HTTP request containing a JSON body with the updated diary entry details (title, content, and entryDate).
+ * @returns A JSON response containing the updated diary entry or an error response with an appropriate HTTP status code.
+ */
 export async function PUT(req: Request) {
   const session = await auth.api.getSession({
     headers: req.headers,
@@ -136,6 +171,16 @@ export async function PUT(req: Request) {
   }
 }
 
+/**
+ * Retrieves the authenticated user's diary entries.
+ *
+ * This function verifies the request's user session and queries the database for diary entries belonging
+ * to the user. If a 'date' query parameter is provided, only entries corresponding to that date are returned.
+ * It responds with a JSON payload of the entries, a 401 Unauthorized response if the user is not authenticated,
+ * or a 500 Internal Server Error response if an error occurs during retrieval.
+ *
+ * @returns A NextResponse containing the diary entries JSON or an error response.
+ */
 export async function GET(req: Request) {
   const session = await auth.api.getSession({
     headers: req.headers,

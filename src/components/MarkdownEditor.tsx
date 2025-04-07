@@ -193,6 +193,22 @@ interface MarkdownEditorProps {
   placeholder?: string;
 }
 
+/**
+ * Renders a Markdown editor using CodeMirror.
+ *
+ * This component delays rendering until after mounting to ensure compatibility with server-side rendering. It integrates extensions for Markdown parsing, syntax highlighting, custom theming, and dynamic decorations based on the active line.
+ *
+ * @param value - The Markdown content to display in the editor.
+ * @param onChange - Callback triggered when the editor content changes.
+ * @param placeholder - Optional placeholder text displayed when the editor is empty.
+ *
+ * @example
+ * <MarkdownEditor
+ *   value="Initial markdown text"
+ *   onChange={setMarkdownText}
+ *   placeholder="Type your markdown here..."
+ * />
+ */
 export function MarkdownEditor({ value, onChange, placeholder }: MarkdownEditorProps) {
   const [isMounted, setIsMounted] = useState(false);
 

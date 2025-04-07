@@ -11,6 +11,13 @@ interface StreakInfo {
   lastEntryDate: string | null;
 }
 
+/**
+ * Displays a user's streak information using badge components.
+ *
+ * This component fetches streak data asynchronously from the `/api/streak` endpoint and updates its display accordingly.
+ * It refetches data when the route changes and refreshes automatically every minute. If streak data is not available,
+ * the component renders nothing.
+ */
 export function StreakDisplay() {
   const [streak, setStreak] = useState<StreakInfo | null>(null);
   const pathname = usePathname();

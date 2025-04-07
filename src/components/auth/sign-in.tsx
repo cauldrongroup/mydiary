@@ -10,6 +10,12 @@ import { Loader2 } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
 
+/**
+ * Renders a sign-in form for user authentication.
+ *
+ * This component displays a card containing input fields for email and password, a "remember me" checkbox, and a login button.
+ * When the button is clicked, it initiates an asynchronous sign-in process and shows a loading spinner while the request is in progress.
+ */
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

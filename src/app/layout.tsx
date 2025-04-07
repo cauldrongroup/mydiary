@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   description: "A simple diary app to record your daily thoughts and memories.",
 };
 
+/**
+ * Provides the root layout for the diary application.
+ *
+ * This asynchronous component retrieves the current user's session from the request cookies and queries the database to check whether the user has already created a diary entry for today. It then renders an HTML structure with a navigation bar that conditionally displays links and buttons for signing in, signing out, or creating a new diary entry based on the user's authentication state.
+ *
+ * @param children - The child components to render within the layout.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{

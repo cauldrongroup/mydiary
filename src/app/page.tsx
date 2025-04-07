@@ -6,6 +6,16 @@ import { eq } from 'drizzle-orm';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
+/**
+ * Removes Markdown formatting from text and truncates it to a specified maximum length.
+ *
+ * The function strips common Markdown syntax such as headers, bold, italics, links, and list markers, then trims the result. If the cleaned text exceeds the provided maximum length, it is truncated to the last whole word within the limit and an ellipsis is appended.
+ *
+ * @param content - Markdown-formatted text to be processed.
+ * @param maxLength - Maximum allowed length of the processed text (default is 150 characters).
+ *
+ * @returns The cleaned plain text, possibly truncated with an ellipsis.
+ */
 function truncateContent(content: string, maxLength: number = 150): string {
   // Remove Markdown syntax
   const cleanContent = content
@@ -27,6 +37,15 @@ function truncateContent(content: string, maxLength: number = 150): string {
     : truncated + '...';
 }
 
+/**
+ * Retrieves all diary entries for the specified user.
+ *
+ * This function asynchronously queries the database for diary entries associated with the provided user identifier
+ * and orders the entries by their entry date.
+ *
+ * @param userId - The identifier of the user whose diary entries are retrieved.
+ * @returns A promise that resolves to an array of diary entries ordered by entry date.
+ */
 async function getEntries(userId: string) {
   const entries = await db.select()
     .from(diaryEntries)
@@ -37,6 +56,15 @@ async function getEntries(userId: string) {
   return entries;
 }
 
+/**
+ * Retrieves the current diary entry streak for a specified user.
+ *
+ * Queries the database's streaks table for the first record where the user's identifier matches the provided value.
+ * Returns the associated current streak if found, or 0 if no streak record exists.
+ *
+ * @param userId - The unique identifier of the user.
+ * @returns The current streak count for the user, or 0 if no streak is recorded.
+ */
 async function getStreak(userId: string) {
   const userStreak = await db.query.streaks.findFirst({
     where: eq(streaks.userId, userId),
@@ -45,6 +73,15 @@ async function getStreak(userId: string) {
   return userStreak?.currentStreak || 0;
 }
 
+/**
+ * Renders the diary homepage.
+ *
+ * Checks for an authenticated user session using cookies. If no session is found, displays a sign-in prompt.
+ * When authenticated, fetches the user's diary entries and current day streak, then renders a personalized welcome message,
+ * the streak count, and a list of up to five recent diary entries with truncated content and formatted dates.
+ *
+ * @returns A JSX element representing the diary homepage.
+ */
 export default async function Home() {
   const cookieHeader = cookies().toString();
   const headers = new Headers();
