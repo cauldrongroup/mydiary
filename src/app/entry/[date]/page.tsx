@@ -13,6 +13,17 @@ interface EntryPageProps {
   }>;
 }
 
+/**
+ * Renders a diary entry page for a specified date.
+ *
+ * This asynchronous server component authenticates the user using request cookies, fetches the diary entry
+ * corresponding to the provided date, and determines if the entry can be edited (only when the entry date matches
+ * the current date). If the user is not authenticated, it redirects to the sign-in page; if no diary entry exists,
+ * it redirects to the home page.
+ *
+ * @param params - A promise that resolves to an object containing the `date` string for the diary entry.
+ * @returns A JSX element representing the diary entry page.
+ */
 export default async function EntryPage({ params }: EntryPageProps) {
   const cookieHeader = cookies().toString();
   const headers = new Headers();

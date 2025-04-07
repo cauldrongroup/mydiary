@@ -15,6 +15,21 @@ interface DiaryEntryProps {
   entryDate?: string;
 }
 
+/**
+ * Renders a diary entry form that lets users create or update a diary entry.
+ *
+ * This component displays an input for the title and a Markdown editor for the content.
+ * It manages local state for these fields and handles the save operation by determining
+ * whether to create a new entry or update an existing one based on the current route.
+ * Upon saving, it checks for a valid user session, submits the entry via an API call,
+ * displays error feedback if needed, and navigates appropriately.
+ *
+ * @param initialTitle - The initial title for the diary entry.
+ * @param initialContent - The initial content for the diary entry.
+ * @param isEditing - Indicates if the entry is in edit mode, affecting post-save navigation.
+ * @param entryDate - Optional diary entry date; defaults to the current date if not provided.
+ * @returns A JSX element representing the diary entry form.
+ */
 export function DiaryEntry({ initialTitle = '', initialContent = '', isEditing = false, entryDate }: DiaryEntryProps) {
   const { data: sessionData } = useSession();
   const router = useRouter();

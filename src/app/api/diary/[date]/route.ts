@@ -4,6 +4,20 @@ import { diaryEntries } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 
+/**
+ * Handles HTTP PUT requests to update a user's diary entry.
+ *
+ * This function verifies the user's session for authentication and extracts the new title and content from the request's JSON body.
+ * It retrieves the diary entry date from the route parameters and checks if an entry exists for the authenticated user. If the entry is absent,
+ * a 404 response is returned; if the entry cannot be edited, a 403 response is issued. On successful validation, the entry is updated with the
+ * new details and the current timestamp, and the updated entry is returned as a JSON response.
+ *
+ * @param request - The incoming HTTP request.
+ * @param params - An object with a promise resolving to route parameters, including the diary entry date.
+ *
+ * @returns A NextResponse containing the updated diary entry if the update succeeds, or an error response with an appropriate status code
+ *          (401 if unauthorized, 404 if not found, 403 if editing is forbidden, or 500 for internal errors).
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ date: string }> }
