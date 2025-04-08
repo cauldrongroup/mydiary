@@ -5,7 +5,7 @@ import { DiaryEntry } from '@/components/DiaryEntry';
 import { db } from '@/db';
 import { diaryEntries } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 interface EntryPageProps {
   params: Promise<{
@@ -47,7 +47,7 @@ export default async function EntryPage({ params }: EntryPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">
-        Entry for {format(new Date(entry.entryDate), 'MMMM d, yyyy')}
+        Entry for {format(parseISO(entry.entryDate), 'MMMM d, yyyy')}
       </h1>
       <DiaryEntry
         initialTitle={entry.title}
