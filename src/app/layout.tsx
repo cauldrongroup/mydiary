@@ -75,7 +75,7 @@ export default async function RootLayout({
                   </>
                 ) : (
                   <Link
-                    href="/api/auth/signin"
+                    href="/auth"
                     className="text-sm hover:text-primary transition-colors"
                   >
                     <Button variant="outline">Sign In</Button>

@@ -60,7 +60,7 @@ export default async function Home() {
         <h1 className="text-4xl font-bold mb-8">Welcome to MyDiary</h1>
         <p className="text-lg mb-8">Please sign in to start writing your diary.</p>
         <Link
-          href="/api/auth/signin"
+          href="/auth"
           className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
         >
           Sign In
