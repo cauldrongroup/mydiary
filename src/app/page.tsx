@@ -69,7 +69,7 @@ export default async function Home() {
             <p className="text-xl text-muted-foreground mb-8">
               Capture your thoughts, track your journey, and build a daily writing habit.
             </p>
-            <Link href="/auth">
+            <Link href="/login">
               <Button size="lg" className="font-semibold">
                 Start Writing Today
               </Button>
@@ -145,7 +145,7 @@ export default async function Home() {
             <p className="text-muted-foreground mb-6">
               Join thousands of others who are documenting their lives, one day at a time.
             </p>
-            <Link href="/auth">
+            <Link href="/login">
               <Button variant="outline" size="lg" className="font-semibold">
                 Sign Up Now
               </Button>
