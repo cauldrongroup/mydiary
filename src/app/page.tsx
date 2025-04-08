@@ -119,7 +119,7 @@ export default async function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                Look back on your experiences and see how you've grown over time through your daily reflections.
+                Look back on your experiences and see how you&apos;ve grown over time through your daily reflections.
               </CardContent>
             </Card>
 
