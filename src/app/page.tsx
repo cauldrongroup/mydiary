@@ -2,9 +2,12 @@ import { auth } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { db } from '@/db';
 import { diaryEntries, streaks } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import { format } from 'date-fns';
+import { eq, desc } from 'drizzle-orm';
+import { format, parseISO } from 'date-fns';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CalendarDays, BookOpen, Sparkles, Trophy } from 'lucide-react';
 
 function truncateContent(content: string, maxLength: number = 150): string {
   // Remove Markdown syntax
@@ -31,7 +34,7 @@ async function getEntries(userId: string) {
   const entries = await db.select()
     .from(diaryEntries)
     .where(eq(diaryEntries.userId, userId))
-    .orderBy(diaryEntries.entryDate)
+    .orderBy(desc(diaryEntries.entryDate))
     .all();
 
   return entries;
@@ -56,15 +59,99 @@ export default async function Home() {
 
   if (!session?.user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-4xl font-bold mb-8">Welcome to MyDiary</h1>
-        <p className="text-lg mb-8">Please sign in to start writing your diary.</p>
-        <Link
-          href="/api/auth/signin"
-          className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
-        >
-          Sign In
-        </Link>
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Hero Section */}
+          <div className="text-center mb-16">
+            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Your Personal Digital Diary
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              Capture your thoughts, track your journey, and build a daily writing habit.
+            </p>
+            <Link href="/login">
+              <Button size="lg" className="font-semibold">
+                Start Writing Today
+              </Button>
+            </Link>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 gap-6 mb-16">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="h-5 w-5 text-primary" />
+                  Daily Journaling
+                </CardTitle>
+                <CardDescription>
+                  Build a consistent writing habit with our daily entry system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                Record one meaningful entry each day to maintain your streak and track your progress.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-primary" />
+                  Streak Tracking
+                </CardTitle>
+                <CardDescription>
+                  Stay motivated with achievement tracking
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                Watch your writing streak grow and celebrate your consistency milestones.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  Personal Growth
+                </CardTitle>
+                <CardDescription>
+                  Track your journey of self-discovery
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                Look back on your experiences and see how you&apos;ve grown over time through your daily reflections.
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Rich Text Support
+                </CardTitle>
+                <CardDescription>
+                  Express yourself fully
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                Write with Markdown formatting to structure your thoughts exactly how you want.
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold mb-4">Ready to Start Your Journey?</h2>
+            <p className="text-muted-foreground mb-6">
+              Join thousands of others who are documenting their lives, one day at a time.
+            </p>
+            <Link href="/login">
+              <Button variant="outline" size="lg" className="font-semibold">
+                Sign Up Now
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -102,7 +189,7 @@ export default async function Home() {
                     </p>
                   </div>
                   <time className="text-sm text-muted-foreground whitespace-nowrap">
-                    {format(new Date(entry.entryDate), 'MMM d, yyyy')}
+                    {format(parseISO(entry.entryDate), 'MMM d, yyyy')}
                   </time>
                 </div>
               </Link>

@@ -3,6 +3,7 @@ import { db, canEditEntry } from '@/db';
 import { diaryEntries, streaks } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
+import { parseISO, addDays, format } from 'date-fns';
 
 async function updateStreak(userId: string, entryDate: string) {
   // Get the current streak info
@@ -10,10 +11,9 @@ async function updateStreak(userId: string, entryDate: string) {
     where: eq(streaks.userId, userId),
   });
 
-  const today = new Date(entryDate);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const today = parseISO(entryDate);
+  const yesterday = addDays(today, -1);
+  const yesterdayStr = format(yesterday, 'yyyy-MM-dd');
 
   if (!userStreak) {
     // First time user, create streak record
