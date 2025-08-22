@@ -1,3 +1,4 @@
+# WARNING: THIS PROJECT IS HEAVILY DEPRECATED
 # MyDiary
 
 A personal diary/journal application built for fun and learning.
